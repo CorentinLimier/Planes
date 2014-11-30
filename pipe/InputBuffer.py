@@ -6,7 +6,7 @@ Created on 30 nov. 2014
 
 from collections import deque
 
-class Input(object):
+class InputBuffer(object):
 
     def __init__(self):
         self.inputs = deque()
