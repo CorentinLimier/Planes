@@ -5,12 +5,9 @@ Created on 30 nov. 2014
 '''
 
 class InputAction():
-    
+
     def __init__(self):
-        self.turnLeft = False
-        self.turnRight = False
-        self.fire = False
-        
-    def updateStatus(self):
-        raise NotImplementedError
+        self.hasTurnedLeft = False
+        self.hasTurnedRight = False
+        self.hasFired = False
         
