@@ -17,4 +17,3 @@ class InputBuffer(object):
     def pop(self):
         return self.inputs.pop()
 
-        
