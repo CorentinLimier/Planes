@@ -3,7 +3,7 @@ import pygame
 from userInputFeed.userInputFeedVoid import UserInputFeedVoid
 from userInputFeed.userInputFeedLocal import UserInputFeedLocal
 from userInputFeed.userInputFeedNetwork import UserInputFeedNetwork
-import game
+import game.bo.player
 
 
 class Game():

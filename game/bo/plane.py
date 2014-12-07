@@ -1,10 +1,4 @@
-'''
-Created on 1 d�c. 2014
-
-@author: Corentin
-'''
-
-from game.physicsEngine.position import Position
+from game.bo.position import Position
 
 class Plane():
     

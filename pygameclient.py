@@ -2,7 +2,7 @@
 from twisted.internet import reactor
 from twisted.internet.protocol import ClientFactory
 from twisted.protocols.basic import LineReceiver
-from game.engine.game import Game
+from game.engine.engine import Game
 
 '''
 class GameClientProtocol(LineReceiver):
