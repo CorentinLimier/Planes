@@ -1,13 +1,6 @@
-'''
-Created on 1 d�c. 2014
-
-@author: Corentin
-'''
-
-import math
 
 from game.bo.position import Position
-
+import math
 
 def computeGravity(position, speed, angle, elapsed_time, gravity_coeff=9.82):
     
