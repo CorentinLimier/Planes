@@ -2,6 +2,7 @@ from userInput.userInput import UserInput
 import pygame
 import time
 
+
 class UserInputFeedLocal():
     def __init__(self):
         self._user_input = UserInput()
@@ -27,10 +28,3 @@ class UserInputFeedLocal():
         now = time.time()
         self._user_input.now = now
         return self._user_input
-
-    def start(self):
-        pass
-
-    def stop(self):
-        pass
-

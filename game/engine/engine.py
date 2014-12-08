@@ -1,9 +1,5 @@
 
 import pygame
-from userInputFeed.userInputFeedVoid import UserInputFeedVoid
-from userInputFeed.userInputFeedLocal import UserInputFeedLocal
-from userInputFeed.userInputFeedNetwork import UserInputFeedNetwork
-import game.bo.player
 
 
 class Game():
@@ -20,16 +16,16 @@ class Game():
             'green': (0, 0, 255)
         }
         self.img = {
-            'plane': pygame.image.load('plane.png')
+            'plane': pygame.image.load('game/hmi/asset/plane.png')
         }
 
         self.screen = pygame.display.set_mode((self.display_width, self.display_height))
         pygame.display.set_caption('Planes')
 
         self.players = []
-        self.players.append(game.bo.player.Player(self, UserInputFeedVoid()))
-        self.players.append(game.bo.player.Player(self, UserInputFeedLocal()))
-        self.players.append(game.bo.player.Player(self, UserInputFeedNetwork()))
+
+    def add_player(self, player):
+        self.players.append(player)
 
     def draw(self):
         self.screen.fill(self.color['white'])
@@ -37,23 +33,8 @@ class Game():
             self.screen.blit(self.img['plane'], player.plane_xy)
         pygame.display.update()
 
-    def tick(self):
-        quit = False
-        for player in self.players:
-            player.update_state_from_input_feed()
-            if player.plane_crashed:
-                quit = True
-
-        if quit:
-            return False
-        else:
-            self.draw()
-            return True
-
     def init(self):
-        for player in self.players:
-            player.input_feed.start()
+        pass
 
     def quit(self):
-        for player in self.players:
-            player.input_feed.stop()
+        pass

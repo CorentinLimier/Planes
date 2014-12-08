@@ -27,22 +27,31 @@ class ConnectionHandler(LineReceiver):
         self.users[self.id].id = True
         self.send_broadcast_payload({
             'id': self.id,
-            'line': 'connected'
+            'type': 'server_message',
+            'content': 'connected'
+        })
+        self.send_payload({
+            'id': self.id,
+            'type': 'server_message',
+            'users': self.users.keys()
         })
 
     def connectionLost(self, reason):
         self.users[self.id].connected = False
         self.send_broadcast_payload({
             'id': self.id,
-            'line': 'disconnected'
+            'type': 'server_message',
+            'content': 'disconnected'
         })
         if self.id in self.users:
             del self.users[self.id]
 
     def lineReceived(self, line):
-        self.send_broadcast_payload({
+        print "LINE RECEIVED: %s" % line
+        self.send_broadcast_payload_except_self({
             'id': self.id,
-            'line': line
+            'type': 'user_input',
+            'content': line
         })
 
     def send_broadcast_payload_except_self(self, payload):
@@ -61,7 +70,7 @@ class ConnectionHandler(LineReceiver):
         self.sendLine(json.dumps(payload))
 
     def rawDataReceived(self, data):
-        pass
+        LineReceiver.rawDataReceived(self, data)
 
 
 class ServerFactory(Factory):

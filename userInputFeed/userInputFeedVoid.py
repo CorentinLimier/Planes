@@ -7,9 +7,3 @@ class UserInputFeedVoid():
 
     def fetch_user_input(self):
         return UserInput()
-
-    def start(self):
-        pass
-
-    def stop(self):
-        pass
