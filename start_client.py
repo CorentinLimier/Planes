@@ -2,7 +2,7 @@
 import pygame
 from game.engine.engine import Game
 from game.bo.player import Player
-from network.client import ClientProcessSocket as ClientProcess
+from network.client import ClientProcessTwisted as ClientProcess
 from userInputFeed.userInputFeedLocal import UserInputFeedLocal
 from userInput.userInput import UserInput
 import socket
@@ -34,11 +34,10 @@ if __name__ == "__main__":
         return payload
 
     def payload_to_user_input(payload):
-        #print "payload -> user_input: %s" % payload
+        print "payload -> user_input: (%s)" % payload
         user_input = UserInput()
-        if payload and 'type' in payload and payload['type'] == 'user_input':
-            user_input.has_pressed_left = payload['has_pressed_left']
-            user_input.has_pressed_right = payload['has_pressed_right']
+        user_input.has_pressed_left = payload['content']['has_pressed_left']
+        user_input.has_pressed_right = payload['content']['has_pressed_right']
         return user_input
 
 
@@ -47,9 +46,19 @@ if __name__ == "__main__":
         # fetch network inputs and update game state
         if not networkProcess.output_queue.empty():
             payload = networkProcess.output_queue.get()
+            print 'output_queue from main (from server to app)'
             print payload
-            user_input = payload_to_user_input(payload)
-            networkPlayer.update_state(user_input)
+
+            if payload and 'type' in payload and payload['type'] == 'user_input':
+                user_input = payload_to_user_input(payload)
+                networkPlayer.update_state(user_input)
+                print networkPlayer
+
+            if payload and 'type' in payload and payload['type'] == 'authentication':
+                pass
+
+            if payload and 'type' in payload and payload['type'] == 'user_list':
+                pass
 
         # fetch local input and update game state
         user_input = localInputFeed.fetch_user_input()
@@ -64,6 +73,8 @@ if __name__ == "__main__":
 
         # send local user_inputs
         payload = user_input_to_payload(user_input)
+        print 'input_queue from main (from server to app)'
+        print payload
         networkProcess.input_queue.put(payload)
 
         # ask for 60 frames per second

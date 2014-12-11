@@ -27,13 +27,13 @@ class ConnectionHandler(LineReceiver):
         self.users[self.id].id = True
         self.send_broadcast_payload({
             'id': self.id,
-            'type': 'server_message',
-            'content': 'connected'
+            'type': 'authentication',
+            'content': json.dumps({'id': self.id})
         })
         self.send_payload({
             'id': self.id,
-            'type': 'server_message',
-            'users': self.users.keys()
+            'type': 'user_list',
+            'users': json.dumps({'ids': self.users.keys()})
         })
 
     def connectionLost(self, reason):
@@ -46,12 +46,13 @@ class ConnectionHandler(LineReceiver):
         if self.id in self.users:
             del self.users[self.id]
 
-    def lineReceived(self, line):
-        print "LINE RECEIVED: %s" % line
+    def lineReceived(self, json_payload):
+        print "LINE RECEIVED: %s" % json_payload
+        payload = json.loads(json_payload)
         self.send_broadcast_payload_except_self({
             'id': self.id,
             'type': 'user_input',
-            'content': line
+            'content': payload
         })
 
     def send_broadcast_payload_except_self(self, payload):

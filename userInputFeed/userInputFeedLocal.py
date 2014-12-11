@@ -16,10 +16,8 @@ class UserInputFeedLocal():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     self._user_input.has_pressed_left = True
-                    self._user_input.orientation_delta += -5
                 elif event.key == pygame.K_RIGHT:
                     self._user_input.has_pressed_right = True
-                    self._user_input.orientation_delta += 5
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
