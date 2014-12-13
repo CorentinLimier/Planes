@@ -17,7 +17,7 @@ def send_to_server_recursive_threaded_loop(connection_handler):
         Logger.debug('fetch input_queue from network process sender thread', payload, category='client')
         connection_handler.sendLine(json.dumps(payload))
 
-    time.sleep(0.5)  # 500 ms
+    # time.sleep(0.05)  # 50 ms
     # get our Deferred which will be called with the largeFibonnaciNumber result
     threads.deferToThread(send_to_server_recursive_threaded_loop, connection_handler)
 

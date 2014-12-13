@@ -48,7 +48,7 @@ class ConnectionHandler(LineReceiver):
             del self.users[self.id]
 
     def lineReceived(self, json_payload):
-        Logger.debug('line received: %s', json_payload, category='server')
+        Logger.debug('line received: %s', json_payload, 'server')
         payload = json.loads(json_payload)
         self.send_broadcast_payload_except_self({
             'id': self.id,
@@ -58,20 +58,20 @@ class ConnectionHandler(LineReceiver):
 
     def send_broadcast_payload_except_self(self, payload):
         payload = json.dumps(payload)
-        Logger.debug('broadcasting except self: %s', payload, category='server')
+        Logger.debug('broadcasting except self: %s', payload, 'server')
         for name, connection in self.users.iteritems():
             if connection.protocol != self:
                 connection.protocol.sendLine(payload)
 
     def send_broadcast_payload(self, payload):
         payload = json.dumps(payload)
-        Logger.debug('broadcasting to all: %s', payload, category='server')
+        Logger.debug('broadcasting to all: %s', payload, 'server')
         for name, connection in self.users.iteritems():
             connection.protocol.sendLine(payload)
 
     def send_payload(self, payload):
         payload = json.dumps(payload)
-        Logger.debug('send payload to self only: %s', payload, category='server')
+        Logger.debug('send payload to self only: %s', payload, 'server')
         self.sendLine(payload)
 
     def rawDataReceived(self, data):
