@@ -43,7 +43,6 @@ if __name__ == "__main__":
         user_input.has_pressed_right = payload['content']['has_pressed_right']
         return user_input
 
-
     quit = False
     while not quit:
         # fetch network inputs and update game state
@@ -95,11 +94,12 @@ if __name__ == "__main__":
         # redraw game
         hmi.draw()
 
-        # send local user_inputs
-        Logger.debug("user_input to payload, from screen to network process", category='start_client')
-        payload = user_input_to_payload(user_input)
-        Logger.trace("user_input to payload, from screen to network process: (%s)", payload, 'start_client')
-        networkProcess.input_queue.put(payload)
+        if user_input.has_pressed_something():
+            # send local user_inputs
+            Logger.debug("user_input to payload, from screen to network process", category='start_client')
+            payload = user_input_to_payload(user_input)
+            Logger.trace("user_input to payload, from screen to network process: (%s)", payload, 'start_client')
+            networkProcess.input_queue.put(payload)
 
         # ask for 60 frames per second
         clock.tick(60)

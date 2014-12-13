@@ -11,3 +11,19 @@ class UserInput():
     def __init__(self):
         self.now = time.time()
         pass
+
+    def has_pressed_something(self):
+        return self.has_pressed_left or self.has_pressed_right
+
+
+class UserInputAggregate():
+    pressed_left_frame_count = 0
+    pressed_right_frame_count = 0
+    now = None
+
+    def __init__(self):
+        self.now = time.time()
+        pass
+
+    def has_pressed_something(self):
+        return self.pressed_left_frame_count > 0 or self.pressed_right_frame_count > 0
