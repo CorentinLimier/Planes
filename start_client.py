@@ -1,6 +1,7 @@
 
 import pygame
 from game.engine.engine import Game
+from game.hmi.hmi import Hmi
 from game.bo.player import Player
 from network.client import ClientProcessTwisted as ClientProcess
 from userInputFeed.userInputFeedLocal import UserInputFeedLocal
@@ -10,6 +11,7 @@ from logger.logger import Logger
 if __name__ == "__main__":
     pygame.init()
     game = Game()
+    hmi = Hmi(800,400)
     clock = pygame.time.Clock()
 
     networkProcess = ClientProcess()
@@ -18,10 +20,14 @@ if __name__ == "__main__":
     localInputFeed = UserInputFeedLocal()
 
     game.init()
-    localPlayer = Player(game)
-    networkPlayer = Player(game)
+    
+    localPlayer = Player(game, hmi)
+    networkPlayer = Player(game, hmi)
+    
     game.add_player(localPlayer)
     game.add_player(networkPlayer)
+    hmi.add_player(localPlayer)
+    hmi.add_player(networkPlayer)
 
     def user_input_to_payload(user_input):
         payload = {}
@@ -59,11 +65,11 @@ if __name__ == "__main__":
         localPlayer.update_state(user_input)
 
         # check for quit button
-        if localPlayer.plane_crashed or networkPlayer.plane_crashed:
+        if localPlayer.plane.crashed or networkPlayer.plane.crashed:
             quit = True
 
         # redraw game
-        game.draw()
+        hmi.draw()
 
         # send local user_inputs
         Logger.debug("user_input to payload, from screen to network process", category='start_client')

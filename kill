@@ -1,0 +1,4 @@
+#!/bin/sh
+
+pkill -9 -f start_server.py
+pkill -9 -f start_client.py
