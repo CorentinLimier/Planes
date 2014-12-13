@@ -1,10 +1,9 @@
-from game.bo.position import Position
-
 class Plane():
     
-    def __init__(self):
-        self.position = Position()
-        self.angle = 0
+    def __init__(self, position, angle):
+        self.position = position
+        self.angle = angle
+        self.crashed = False
         
     def update(self, elapsed_time = 1):
         pass

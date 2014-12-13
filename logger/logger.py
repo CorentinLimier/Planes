@@ -6,11 +6,11 @@ from datetime import datetime
 class Logger():
 
     displayed_levels = [
-        'error',
-        'warn',
-        'info',
-        'debug',
-        'trace'
+#         'error',
+#         'warn',
+#         'info',
+#         'debug',
+#         'trace'
     ]
 
     hidden_categories = [

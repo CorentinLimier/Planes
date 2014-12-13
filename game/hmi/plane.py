@@ -1,11 +1,11 @@
 '''
-Created on 1 déc. 2014
+Created on 1 dï¿½c. 2014
 
 @author: Corentin
 '''
 
 
-class PlaneGraph():
+class Plane():
     
     def __init__(self, plane):
         self.plane = plane

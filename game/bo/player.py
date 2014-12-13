@@ -5,10 +5,11 @@ from game.bo.plane import Plane
 
 class Player():
 
-    def __init__(self, game):
+    def __init__(self, game, hmi):
         self.game = game
-        self.plane_xy = (self.game.display_width * 0.45, self.game.display_height * 0.8)
-        self.plane_crashed = False
+        self.hmi = hmi
+        self.plane = Plane((self.hmi.width * 0.45, self.hmi.height * 0.8), 0)
+
 
     def update_state(self, user_input):
         if user_input:
@@ -18,6 +19,6 @@ class Player():
             elif user_input.has_pressed_right:
                 orientation_delta = 5
 
-            self.plane_xy = (self.plane_xy[0], self.plane_xy[1] + orientation_delta)
+            self.plane.position = (self.plane.position[0], self.plane.position[1] + orientation_delta)
             if user_input.has_pressed_quit:
-                self.plane_crashed = True
+                self.plane.crashed = True
