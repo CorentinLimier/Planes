@@ -30,7 +30,10 @@ class Hmi():
         
     def add_player(self, player):
         self.players.append(player)        
-        
+
+    def remove_player(self, player):
+        self.players.remove(player)
+
     def emptyScreen(self):        
         self.screen.fill(self.color['white'])
     

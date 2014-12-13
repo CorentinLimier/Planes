@@ -3,9 +3,9 @@ from twisted.internet.protocol import ClientFactory
 from twisted.protocols.basic import LineReceiver
 import multiprocessing
 from twisted.internet import reactor
+import time
 import json
 from twisted.internet import threads
-import time
 from logger.logger import Logger
 
 
@@ -17,7 +17,7 @@ def send_to_server_recursive_threaded_loop(connection_handler):
         Logger.debug('fetch input_queue from network process sender thread', payload, category='client')
         connection_handler.sendLine(json.dumps(payload))
 
-    # time.sleep(0.05)  # 50 ms
+    time.sleep(0.01)  # 10 ms
     # get our Deferred which will be called with the largeFibonnaciNumber result
     threads.deferToThread(send_to_server_recursive_threaded_loop, connection_handler)
 

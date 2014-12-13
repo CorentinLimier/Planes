@@ -1,5 +1,3 @@
-import pygame
-from game.hmi.hmi import Hmi
 
 
 class Game():
@@ -9,6 +7,9 @@ class Game():
 
     def add_player(self, player):
         self.players.append(player)
+
+    def remove_player(self, player):
+        self.players.remove(player)
 
     def init(self):
         pass

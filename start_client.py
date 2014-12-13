@@ -14,20 +14,22 @@ if __name__ == "__main__":
     hmi = Hmi(800,400)
     clock = pygame.time.Clock()
 
+    # init network process
     networkProcess = ClientProcess()
     networkProcess.start()
 
+    # init local game
     localInputFeed = UserInputFeedLocal()
-
     game.init()
-    
+
+    # init local player
+    localPlayerId = None
     localPlayer = Player(game, hmi)
-    networkPlayer = Player(game, hmi)
-    
     game.add_player(localPlayer)
-    game.add_player(networkPlayer)
     hmi.add_player(localPlayer)
-    hmi.add_player(networkPlayer)
+
+    # init player map
+    playerMap = {}
 
     def user_input_to_payload(user_input):
         payload = {}
@@ -52,21 +54,43 @@ if __name__ == "__main__":
             if payload and 'type' in payload and payload['type'] == 'user_input':
                 Logger.trace("fetch input_queue from main, from network process to screen: (%s)", payload, 'start_client')
                 user_input = payload_to_user_input(payload)
-                networkPlayer.update_state(user_input)
+                user_id = payload['id']
+                playerMap[user_id].update_state(user_input)
 
             if payload and 'type' in payload and payload['type'] == 'authentication':
-                pass
+                Logger.info("Authentication (%s)", payload, 'start_client')
+                localPlayerId = payload['id']
+                playerMap[localPlayerId] = localPlayer
 
             if payload and 'type' in payload and payload['type'] == 'user_list':
-                pass
+                Logger.info("User list (%s)", payload, 'start_client')
+                for user_id in payload['users']['ids']:
+                    if not user_id == localPlayerId:
+                        networkPlayer = Player(game, hmi)
+                        hmi.add_player(networkPlayer)
+                        game.add_player(networkPlayer)
+                        playerMap[user_id] = networkPlayer
+
+            if payload and 'type' in payload and payload['type'] == 'new_connection':
+                Logger.info("User new connection (%s)", payload, 'start_client')
+                user_id = payload['id']
+                networkPlayer = Player(game, hmi)
+                hmi.add_player(networkPlayer)
+                game.add_player(networkPlayer)
+                playerMap[user_id] = networkPlayer
+
+            if payload and 'type' in payload and payload['type'] == 'lost_connection':
+                Logger.info("User lost connection (%s)", payload, 'start_client')
+                user_id = payload['id']
+                networkPlayer = playerMap[user_id]
+                hmi.remove_player(networkPlayer)
+                game.remove_player(networkPlayer)
+                playerMap.pop(user_id, None)
+
 
         # fetch local input and update game state
         user_input = localInputFeed.fetch_user_input()
         localPlayer.update_state(user_input)
-
-        # check for quit button
-        if localPlayer.plane.crashed or networkPlayer.plane.crashed:
-            quit = True
 
         # redraw game
         hmi.draw()

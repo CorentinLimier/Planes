@@ -26,23 +26,27 @@ class ConnectionHandler(LineReceiver):
     def connectionMade(self):
         self.users[self.id].connected = True
         self.users[self.id].id = True
-        self.send_broadcast_payload({
+        self.send_payload({
             'id': self.id,
-            'type': 'authentication',
-            'content': json.dumps({'id': self.id})
+            'type': 'authentication'
         })
         self.send_payload({
             'id': self.id,
             'type': 'user_list',
-            'users': json.dumps({'ids': self.users.keys()})
+            'users': {
+                'ids': self.users.keys()
+            }
+        })
+        self.send_broadcast_payload_except_self({
+            'id': self.id,
+            'type': 'new_connection'
         })
 
     def connectionLost(self, reason):
         self.users[self.id].connected = False
         self.send_broadcast_payload({
             'id': self.id,
-            'type': 'server_message',
-            'content': 'disconnected'
+            'type': 'lost_connection',
         })
         if self.id in self.users:
             del self.users[self.id]

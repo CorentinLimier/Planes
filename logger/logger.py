@@ -14,7 +14,7 @@ class Logger():
     ]
 
     hidden_categories = [
-        'start_client',
+        # 'start_client',
         # 'client',
         # 'server'
     ]
