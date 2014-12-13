@@ -5,10 +5,7 @@ from game.bo.player import Player
 from network.client import ClientProcessTwisted as ClientProcess
 from userInputFeed.userInputFeedLocal import UserInputFeedLocal
 from userInput.userInput import UserInput
-import socket
-import json
-import time
-
+from logger.logger import Logger
 
 if __name__ == "__main__":
     pygame.init()
@@ -27,14 +24,12 @@ if __name__ == "__main__":
     game.add_player(networkPlayer)
 
     def user_input_to_payload(user_input):
-        #print "user_input -> payload: %s" % user_input
         payload = {}
         payload['has_pressed_left'] = user_input.has_pressed_left
         payload['has_pressed_right'] = user_input.has_pressed_right
         return payload
 
     def payload_to_user_input(payload):
-        print "payload -> user_input: (%s)" % payload
         user_input = UserInput()
         user_input.has_pressed_left = payload['content']['has_pressed_left']
         user_input.has_pressed_right = payload['content']['has_pressed_right']
@@ -46,13 +41,12 @@ if __name__ == "__main__":
         # fetch network inputs and update game state
         if not networkProcess.output_queue.empty():
             payload = networkProcess.output_queue.get()
-            print 'output_queue from main (from server to app)'
-            print payload
+            Logger.debug("fetch input_queue from main, from network process to screen", category='start_client')
 
             if payload and 'type' in payload and payload['type'] == 'user_input':
+                Logger.trace("fetch input_queue from main, from network process to screen: (%s)", payload, 'start_client')
                 user_input = payload_to_user_input(payload)
                 networkPlayer.update_state(user_input)
-                print networkPlayer
 
             if payload and 'type' in payload and payload['type'] == 'authentication':
                 pass
@@ -72,9 +66,9 @@ if __name__ == "__main__":
         game.draw()
 
         # send local user_inputs
+        Logger.debug("user_input to payload, from screen to network process", category='start_client')
         payload = user_input_to_payload(user_input)
-        print 'input_queue from main (from server to app)'
-        print payload
+        Logger.trace("user_input to payload, from screen to network process: (%s)", payload, 'start_client')
         networkProcess.input_queue.put(payload)
 
         # ask for 60 frames per second

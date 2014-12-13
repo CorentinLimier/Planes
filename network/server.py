@@ -1,6 +1,7 @@
 from twisted.internet.protocol import Factory
 from twisted.protocols.basic import LineReceiver
 import json
+from logger.logger import Logger
 
 
 class Connection():
@@ -47,7 +48,7 @@ class ConnectionHandler(LineReceiver):
             del self.users[self.id]
 
     def lineReceived(self, json_payload):
-        print "LINE RECEIVED: %s" % json_payload
+        Logger.debug('line received: %s', json_payload, category='server')
         payload = json.loads(json_payload)
         self.send_broadcast_payload_except_self({
             'id': self.id,
@@ -56,19 +57,22 @@ class ConnectionHandler(LineReceiver):
         })
 
     def send_broadcast_payload_except_self(self, payload):
-        print "broadcast except: %s" % json.dumps(payload)
+        payload = json.dumps(payload)
+        Logger.debug('broadcasting except self: %s', payload, category='server')
         for name, connection in self.users.iteritems():
             if connection.protocol != self:
-                connection.protocol.sendLine(json.dumps(payload))
+                connection.protocol.sendLine(payload)
 
     def send_broadcast_payload(self, payload):
-        print "broadcast: %s" % json.dumps(payload)
+        payload = json.dumps(payload)
+        Logger.debug('broadcasting to all: %s', payload, category='server')
         for name, connection in self.users.iteritems():
-            connection.protocol.sendLine(json.dumps(payload))
+            connection.protocol.sendLine(payload)
 
     def send_payload(self, payload):
-        print "send: %s" % json.dumps(payload)
-        self.sendLine(json.dumps(payload))
+        payload = json.dumps(payload)
+        Logger.debug('send payload to self only: %s', payload, category='server')
+        self.sendLine(payload)
 
     def rawDataReceived(self, data):
         LineReceiver.rawDataReceived(self, data)
