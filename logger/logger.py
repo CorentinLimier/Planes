@@ -9,11 +9,14 @@ class Logger():
         'error',
         'warn',
         'info',
-        'debug',
-        'trace'
+        # 'debug',
+        # 'trace'
     ]
 
     hidden_categories = [
+        'start_client',
+        # 'client',
+        # 'server'
     ]
 
     @staticmethod
