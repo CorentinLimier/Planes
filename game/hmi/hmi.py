@@ -8,9 +8,7 @@ import pygame
 
 class Hmi():
     
-    def __init__(self, game, width, height):
-        self.width = width
-        self.height = height
+    def __init__(self, game):
         self.game = game
 
         self.color = {
@@ -25,7 +23,7 @@ class Hmi():
             'plane': pygame.image.load('game/hmi/asset/plane.png')
         }
 
-        self.screen = pygame.display.set_mode((self.width, self.height))
+        self.screen = pygame.display.set_mode((self.game.width, self.game.height))
         pygame.display.set_caption('Planes')
         
     def emptyScreen(self):        

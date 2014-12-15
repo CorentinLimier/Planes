@@ -10,8 +10,8 @@ from logger.logger import Logger
 
 if __name__ == "__main__":
     pygame.init()
-    game = Game()
-    hmi = Hmi(game,800,400)
+    game = Game(800,400)
+    hmi = Hmi(game)
     clock = pygame.time.Clock()
 
     # init network process
@@ -24,8 +24,7 @@ if __name__ == "__main__":
 
     # init local player
     localPlayerId = None
-    localPlayer = Player(game, hmi)
-    game.add_player(localPlayer)
+    localPlayer = game.add_player()
 
     # init player map
     playerMap = {}
@@ -53,7 +52,7 @@ if __name__ == "__main__":
                 Logger.trace("fetch input_queue from main, from network process to screen: (%s)", payload, 'start_client')
                 user_input = payload_to_user_input(payload)
                 user_id = payload['id']
-                playerMap[user_id].update_state(user_input)
+                game.update_player(playerMap[user_id], user_input)
 
             if payload and 'type' in payload and payload['type'] == 'authentication':
                 Logger.info("Authentication (%s)", payload, 'start_client')
@@ -64,15 +63,13 @@ if __name__ == "__main__":
                 Logger.info("User list (%s)", payload, 'start_client')
                 for user_id in payload['users']['ids']:
                     if not user_id == localPlayerId:
-                        networkPlayer = Player(game, hmi)
-                        game.add_player(networkPlayer)
+                        networkPlayer = game.add_player()
                         playerMap[user_id] = networkPlayer
 
             if payload and 'type' in payload and payload['type'] == 'new_connection':
                 Logger.info("User new connection (%s)", payload, 'start_client')
                 user_id = payload['id']
-                networkPlayer = Player(game, hmi)
-                game.add_player(networkPlayer)
+                networkPlayer = game.add_player()
                 playerMap[user_id] = networkPlayer
 
             if payload and 'type' in payload and payload['type'] == 'lost_connection':
@@ -85,9 +82,10 @@ if __name__ == "__main__":
 
         # fetch local input and update game state
         user_input = localInputFeed.fetch_user_input()
-        localPlayer.update_state(user_input)
+        game.update_player(localPlayer, user_input)
 
         # redraw game
+        game.update()
         hmi.draw()
 
         if user_input.has_pressed_something():
