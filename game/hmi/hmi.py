@@ -8,10 +8,10 @@ import pygame
 
 class Hmi():
     
-    def __init__(self, width, height):
+    def __init__(self, game, width, height):
         self.width = width
         self.height = height
-        self.players = []
+        self.game = game
 
         self.color = {
             'black': (0, 0, 0),
@@ -28,12 +28,6 @@ class Hmi():
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption('Planes')
         
-    def add_player(self, player):
-        self.players.append(player)        
-
-    def remove_player(self, player):
-        self.players.remove(player)
-
     def emptyScreen(self):        
         self.screen.fill(self.color['white'])
     
@@ -45,6 +39,6 @@ class Hmi():
         
     def draw(self):
         self.emptyScreen()
-        for player in self.players:
+        for player in self.game.players:
             self.updatePlayer(player)
         self.updateScreen()

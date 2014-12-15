@@ -11,7 +11,7 @@ from logger.logger import Logger
 if __name__ == "__main__":
     pygame.init()
     game = Game()
-    hmi = Hmi(800,400)
+    hmi = Hmi(game,800,400)
     clock = pygame.time.Clock()
 
     # init network process
@@ -26,7 +26,6 @@ if __name__ == "__main__":
     localPlayerId = None
     localPlayer = Player(game, hmi)
     game.add_player(localPlayer)
-    hmi.add_player(localPlayer)
 
     # init player map
     playerMap = {}
@@ -66,7 +65,6 @@ if __name__ == "__main__":
                 for user_id in payload['users']['ids']:
                     if not user_id == localPlayerId:
                         networkPlayer = Player(game, hmi)
-                        hmi.add_player(networkPlayer)
                         game.add_player(networkPlayer)
                         playerMap[user_id] = networkPlayer
 
@@ -74,7 +72,6 @@ if __name__ == "__main__":
                 Logger.info("User new connection (%s)", payload, 'start_client')
                 user_id = payload['id']
                 networkPlayer = Player(game, hmi)
-                hmi.add_player(networkPlayer)
                 game.add_player(networkPlayer)
                 playerMap[user_id] = networkPlayer
 
@@ -82,7 +79,6 @@ if __name__ == "__main__":
                 Logger.info("User lost connection (%s)", payload, 'start_client')
                 user_id = payload['id']
                 networkPlayer = playerMap[user_id]
-                hmi.remove_player(networkPlayer)
                 game.remove_player(networkPlayer)
                 playerMap.pop(user_id, None)
 
