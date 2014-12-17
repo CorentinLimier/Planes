@@ -27,8 +27,7 @@ class Player():
                     self.plane.turn_right(user_input.pressed_right_frame_count)
             else:
                 raise Exception('Not implemented user input type %s(%s)' % (type(user_input), user_input))
-            
-        self.plane.move_forward()
+
 
     def get_position(self):
         return self.plane.position

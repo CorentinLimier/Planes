@@ -4,7 +4,7 @@ Created on 1 dec. 2014
 @author: Corentin
 '''
 
-import pygame
+import pygame, math
 
 class Hmi():
     
@@ -31,6 +31,7 @@ class Hmi():
     
     def updatePlayer(self, player):
         self.screen.blit(pygame.transform.rotate(self.img['plane'], player.plane.angle), player.plane.position)
+        pygame.draw.circle(self.screen, self.color['black'], (int(player.plane.position[0]),int(player.plane.position[1])), 5)
         
     def updateScreen(self):
         pygame.display.update()

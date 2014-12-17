@@ -4,7 +4,7 @@ class Plane():
     
     def __init__(self, game):
         self.game = game
-        self.position = (self.game.width * 0.45, self.game.height * 0.8)
+        self.position = int(self.game.width * 0.45), int(self.game.height * 0.8)
         self.angle = 0
         self.rotation_speed = 3
         self.speed = 3
@@ -18,7 +18,7 @@ class Plane():
         
     def move_forward(self, frameCount = 1):
         angle = math.radians(self.angle)
-        self.position = (self.position[0] +  self.speed * frameCount * math.cos(angle)) % self.game.width, self.position[1] - self.speed * frameCount * math.sin(angle)
+        self.position = (self.position[0] +  self.speed * frameCount * math.cos(angle)) % self.game.width, (self.position[1] - self.speed * frameCount * math.sin(angle))
         
     def crash(self):
         self.crashed = True
