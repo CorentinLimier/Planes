@@ -26,12 +26,20 @@ class Hmi():
         self.screen = pygame.display.set_mode((self.game.width, self.game.height))
         pygame.display.set_caption('Planes')
         
+    def rot_center(self, image, position, angle):
+        """rotate an image while keeping its center"""
+        rect = image.get_rect().move(*position)
+        rot_image = pygame.transform.rotate(image, angle)
+        rot_rect = rot_image.get_rect(center=rect.center)
+        return rot_image,rot_rect
+        
     def emptyScreen(self):        
         self.screen.fill(self.color['white'])
     
     def updatePlayer(self, player):
-        self.screen.blit(pygame.transform.rotate(self.img['plane'], player.plane.angle), player.plane.position)
-        pygame.draw.circle(self.screen, self.color['black'], (int(player.plane.position[0]),int(player.plane.position[1])), 5)
+        plane, position = self.rot_center(self.img['plane'], player.plane.position, player.plane.angle)
+        self.screen.blit(plane, position)
+        #pygame.draw.circle(self.screen, self.color['black'], (int(player.plane.position[0]),int(player.plane.position[1])), 5)
         
     def updateScreen(self):
         pygame.display.update()

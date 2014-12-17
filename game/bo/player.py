@@ -28,7 +28,6 @@ class Player():
             else:
                 raise Exception('Not implemented user input type %s(%s)' % (type(user_input), user_input))
 
-
     def get_position(self):
         return self.plane.position
 

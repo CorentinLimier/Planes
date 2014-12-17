@@ -6,8 +6,8 @@ class Plane():
         self.game = game
         self.position = int(self.game.width * 0.45), int(self.game.height * 0.8)
         self.angle = 0
-        self.rotation_speed = 3
-        self.speed = 3
+        self.rotation_speed = 5
+        self.speed = 5
         self.crashed = False
         
     def turn_left(self, frameCount = 1):
