@@ -23,3 +23,7 @@ class Game():
     
     def update_player(self, player, user_input):
         player.update_state(user_input)
+        
+    def update(self):
+        for player in self.players : 
+            player.plane.move_forward()
