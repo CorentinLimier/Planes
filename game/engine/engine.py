@@ -6,6 +6,7 @@ class Game():
         self.width = width
         self.height = height
         self.players = []
+        self.bullets = []
 
     def add_player(self):
         player = Player(self)
@@ -14,6 +15,12 @@ class Game():
 
     def remove_player(self, player):
         self.player.remove(player)
+        
+    def add_bullet(self, bullet):
+        self.bullets.append(bullet)
+        
+    def remove_bullet(self, bullet):
+        self.bullets.remove(bullet)
             
     def init(self):
         pass
@@ -27,3 +34,5 @@ class Game():
     def update(self):
         for player in self.players : 
             player.plane.move_forward()
+        for bullet in self.bullets : 
+            bullet.move_forward()

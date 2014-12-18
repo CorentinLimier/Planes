@@ -33,12 +33,14 @@ if __name__ == "__main__":
         payload = {}
         payload['has_pressed_left'] = user_input.has_pressed_left
         payload['has_pressed_right'] = user_input.has_pressed_right
+        payload['has_pressed_fire'] = user_input.has_pressed_fire
         return payload
 
     def payload_to_user_input(payload):
         user_input = UserInput()
         user_input.has_pressed_left = payload['content']['has_pressed_left']
         user_input.has_pressed_right = payload['content']['has_pressed_right']
+        user_input.has_pressed_fire = payload['content']['has_pressed_fire']
         return user_input
 
     quit = False
