@@ -31,7 +31,7 @@ class Hmi():
         rect = image.get_rect().move(*position)
         rot_image = pygame.transform.rotate(image, angle)
         rot_rect = rot_image.get_rect(center=rect.center)
-        return rot_image,rot_rect
+        return rot_image, rot_rect
         
     def emptyScreen(self):        
         self.screen.fill(self.color['white'])
@@ -48,10 +48,10 @@ class Hmi():
         pygame.display.update()
         
     def draw(self):
-        self.emptyScreen()
-        
+        self.emptyScreen()    
         for player in self.game.players:
-            self.draw_plane(player.plane)
             for bullet in player.plane.bullets:
-                self.draw_bullet(bullet)            
+                self.draw_bullet(bullet)  
+            self.draw_plane(player.plane)
+          
         self.updateScreen()

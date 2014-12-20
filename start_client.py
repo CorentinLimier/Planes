@@ -3,7 +3,6 @@ import pygame
 from game.engine.engine import Game
 from game.hmi.hmi import Hmi
 from game.network.client import ClientNetworkGameHandler
-from game.network.server import ServerUserConnectionHandler
 from helper.tick import TickSimulator
 from network.client import ClientProcessTwisted as ClientProcess
 from userInputFeed.userInputFeedLocal import UserInputFeedLocal
@@ -11,7 +10,7 @@ from logger.logger import Logger
 
 if __name__ == "__main__":
     pygame.init()
-    game = Game(800, 400)
+    game = Game(Game.width, Game.height)
     hmi = Hmi(game)
     clock = pygame.time.Clock()
 
@@ -24,7 +23,7 @@ if __name__ == "__main__":
 
     # init client logic
     client_game_handler = ClientNetworkGameHandler(game)
-    tick_simulator = TickSimulator(ServerUserConnectionHandler.fps)
+    tick_simulator = TickSimulator(Game.fps)
 
     quit_the_game = False
     while not quit_the_game:
@@ -51,7 +50,7 @@ if __name__ == "__main__":
             networkProcess.input_queue.put(payload)
 
         # ask for 60 frames per second
-        clock.tick(ServerUserConnectionHandler.fps)
+        clock.tick(Game.fps)
 
     networkProcess.stop()
     game.quit()

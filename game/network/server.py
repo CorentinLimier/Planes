@@ -1,5 +1,4 @@
 import json
-import time
 from game.engine.engine import Game
 from game.network.protocol import PlayerDataUnit, UserInputDataUnit
 from helper.tick import TickSimulator
@@ -19,7 +18,7 @@ class ServerUserConnection():
 
 class ServerUserConnectionHandlerFactory(AbstractServerUserConnectionHandlerFactory):
     def __init__(self):
-        self.game = Game(800, 400)
+        self.game = Game(Game.width, Game.height)
         self.game.init()
         self.users = {}
         self.current_id = 0
@@ -31,13 +30,11 @@ class ServerUserConnectionHandlerFactory(AbstractServerUserConnectionHandlerFact
 
 class ServerUserConnectionHandler(AbstractServerUserConnectionHandler):
 
-    fps = 10
-
     def __init__(self, game, users, user_id):
         self.game = game
         self.user_id = user_id
         self.users = users
-        self.tick_simulator = TickSimulator(ServerUserConnectionHandler.fps)
+        self.tick_simulator = TickSimulator(Game.fps)
 
         connection = ServerUserConnection()
         connection.protocol = self
