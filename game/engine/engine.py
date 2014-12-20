@@ -1,4 +1,5 @@
 from game.bo.player import Player
+from game.bo.plane import Plane
 
 
 class Game():
@@ -10,7 +11,8 @@ class Game():
         self.bullets = []
 
     def add_player(self):
-        player = Player(self)
+        plane = Plane(self.width, self.height)
+        player = Player(plane)
         self.players.append(player)
         return player
 
@@ -18,13 +20,6 @@ class Game():
         if player in self.players:
             self.players.remove(player)
         
-    def add_bullet(self, bullet):
-        self.bullets.append(bullet)
-
-    def remove_bullet(self, bullet):
-        if bullet in self.bullets:
-            self.bullets.remove(bullet)
-
     def init(self):
         pass
 
@@ -36,10 +31,4 @@ class Game():
 
     def tick(self):
         for player in self.players:
-            player.tick()
-
-    def update(self):
-        for player in self.players:
-            player.plane.move_forward()
-        for bullet in self.bullets:
-            bullet.move_forward()
+            player.update()

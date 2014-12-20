@@ -1,13 +1,11 @@
 from userInput.userInput import UserInput, UserInputAggregate
-from game.bo.plane import Plane
 from game.bo.motherFuckingBullet import MotherFuckingBullet
 
 
 class Player():
 
-    def __init__(self, game):
-        self.game = game
-        self.plane = Plane(game)
+    def __init__(self, plane):
+        self.plane = plane
 
     def update_state(self, user_input):
                 
@@ -31,6 +29,9 @@ class Player():
             else:
                 raise Exception('Not implemented user input type %s(%s)' % (type(user_input), user_input))
 
+    def update(self):
+        self.plane.update()
+
     def get_position(self):
         return self.plane.position
 
@@ -42,4 +43,4 @@ class Player():
         self.plane.move_forward()
 
     def shoot(self):
-        self.game.add_bullet(MotherFuckingBullet(self.game, self))
+        self.plane.shoot()

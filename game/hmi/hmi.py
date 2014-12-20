@@ -52,8 +52,6 @@ class Hmi():
         
         for player in self.game.players:
             self.draw_plane(player.plane)
-            
-        for bullet in self.game.bullets:
-            self.draw_bullet(bullet)
-            
+            for bullet in player.plane.bullets:
+                self.draw_bullet(bullet)            
         self.updateScreen()
