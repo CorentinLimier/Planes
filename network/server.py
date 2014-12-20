@@ -1,9 +1,9 @@
 from twisted.internet.protocol import Factory, connectionDone
 from twisted.protocols.basic import LineReceiver
 import json
+from game.network.protocol import PlayerDataUnit, UserInputDataUnit
 from logger.logger import Logger
 from game.engine.engine import Game
-from network.application import Serializer
 
 
 class Connection():
@@ -35,12 +35,12 @@ class ConnectionHandler(LineReceiver):
 
         self.send_payload({
             'type': 'authentication',
-            'user': Serializer.connection_to_player_definition_dic(connection)
+            'user': PlayerDataUnit(connection.player).set_id(connection.user_id).get_pdu(),
         })
 
         user_list = []
         for connection in self.users.itervalues():
-            user_list.append(Serializer.connection_to_player_definition_dic(connection))
+            user_list.append(PlayerDataUnit(connection.player).set_id(connection.user_id).get_pdu())
 
         self.send_payload({
             'type': 'user_list',
@@ -49,7 +49,7 @@ class ConnectionHandler(LineReceiver):
 
         self.send_broadcast_payload_except_self({
             'type': 'new_connection',
-            'user': Serializer.connection_to_player_definition_dic(connection)
+            'user': PlayerDataUnit(connection.player).set_id(connection.user_id).get_pdu()
         })
 
     def connectionLost(self, reason=connectionDone):
@@ -65,14 +65,18 @@ class ConnectionHandler(LineReceiver):
     def lineReceived(self, json_payload):
         Logger.debug('line received: %s', json_payload, 'server')
         payload = json.loads(json_payload)
-        user_input = Serializer.payload_to_user_input(payload)
-        connection = self.users[self.user_id]
-        self.game.update_player(connection.player, user_input)
-        self.send_broadcast_payload_except_self({
-            'type': 'user_input',
-            'content': payload['content'],
-            'user': Serializer.connection_to_player_definition_dic(connection)
-        })
+
+        if payload and 'type' in payload and payload['type'] == 'user_input':
+            user_input = UserInputDataUnit(payload['content']).get_object()
+            connection = self.users[self.user_id]
+            self.game.update_player(connection.player, user_input)
+            self.send_broadcast_payload_except_self({
+                'type': 'user_input',
+                'content': payload['content'],
+                'user': PlayerDataUnit(connection.player).set_id(connection.user_id).get_pdu()
+            })
+        else:
+            Logger.error('Unknown message type: (%s)', json_payload, 'server')
 
     def send_broadcast_payload_except_self(self, payload):
         payload = json.dumps(payload)
