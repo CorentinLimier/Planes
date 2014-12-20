@@ -41,8 +41,8 @@ class Game():
                     
                     if ((bullet.position[0] - opponent.plane.position[0] > 0) and 
                         (bullet.position[0] - opponent.plane.position[0] < 60) and
-                        (bullet.position[1] - opponent.plane.position[0] > 0) and
-                        (bullet.position[0] - opponent.plane.position[0] < 45)):
+                        (bullet.position[1] - opponent.plane.position[1] > 0) and
+                        (bullet.position[1] - opponent.plane.position[1] < 45)):
                             bullet.crashed = True
                             opponent.plane.hearts -= 10
                             

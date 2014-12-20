@@ -8,8 +8,8 @@ class Plane():
         self.height = height
         self.position = [self.width * 0.45, self.height * 0.8]
         self.angle = 0
-        self.rotation_speed = 8
-        self.speed = 8
+        self.rotation_speed = 5
+        self.speed = 5
         self.crashed = False
         self.bullets = []
         self.hearts = 100
