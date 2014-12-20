@@ -57,5 +57,3 @@ class Game():
             self.check_players()
             self.check_bullets()
             player.update()
-            
-    

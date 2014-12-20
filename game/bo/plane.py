@@ -1,4 +1,4 @@
-import math, copy
+import math
 from game.bo.motherFuckingBullet import MotherFuckingBullet
 
 class Plane():
@@ -22,7 +22,7 @@ class Plane():
         
     def update(self):
         crashed_bullets = []
-        for bullet in self.bullets:
+        for bullet in self.bullets: 
             if bullet.crashed :
                 crashed_bullets.append(bullet)
             else :
@@ -37,6 +37,8 @@ class Plane():
         self.position[0] %= self.width
         self.position[1] -= self.speed * frameCount * math.sin(angle)
         self.isCrashed()
+        if  self.position > (self.width, self.height) or self.position > (self.width, self.height):
+            self.crash()
         
     def shoot(self):
         position_bullet_x = self.position[0] + 30

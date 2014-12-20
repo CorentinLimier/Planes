@@ -23,3 +23,8 @@ class MotherFuckingBullet():
     def isCrashed(self):
         if  self.position[0] > self.width or self.position[1] > self.height or self.position[0] < 0 or self.position[1] < 0:
             self.crashed = True
+        if  self.position > (self.width, self.height) or self.position > (self.width, self.height):
+            self.crash()
+        
+    def crash(self):
+        self.crashed = True
