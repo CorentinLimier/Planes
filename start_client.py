@@ -38,24 +38,24 @@ if __name__ == "__main__":
             if payload and 'type' in payload and payload['type'] == 'user_input':
                 Logger.trace("fetch input_queue from main, from network process to screen: (%s)", payload, 'start_client')
                 user_input = Serializer.payload_to_user_input(payload)
-                user_id = payload['id']
+                user_id = payload['user']['id']
                 game.update_player(playerMap[user_id], user_input)
 
             if payload and 'type' in payload and payload['type'] == 'authentication':
                 Logger.info("Authentication (%s)", payload, 'start_client')
-                localPlayerId = payload['id']
+                localPlayerId = payload['user']['id']
                 playerMap[localPlayerId] = localPlayer
 
             if payload and 'type' in payload and payload['type'] == 'user_list':
                 Logger.info("User list (%s)", payload, 'start_client')
-                for user_id in payload['users']['ids']:
-                    if not user_id == localPlayerId:
+                for user_pdu in payload['users']:
+                    if not user_pdu['id'] == localPlayerId:
                         networkPlayer = game.add_player()
-                        playerMap[user_id] = networkPlayer
+                        playerMap[user_pdu['id']] = networkPlayer
 
             if payload and 'type' in payload and payload['type'] == 'new_connection':
                 Logger.info("User new connection (%s)", payload, 'start_client')
-                user_id = payload['id']
+                user_id = payload['user']['id']
                 networkPlayer = game.add_player()
                 playerMap[user_id] = networkPlayer
 

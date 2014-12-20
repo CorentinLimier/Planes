@@ -9,9 +9,12 @@ class Serializer():
     @staticmethod
     def user_input_to_payload(user_input):
         payload = {
-            'has_pressed_left': user_input.has_pressed_left,
-            'has_pressed_right': user_input.has_pressed_right,
-            'has_pressed_fire': user_input.has_pressed_fire
+            'type': 'user_input',
+            'content': {
+                'has_pressed_left': user_input.has_pressed_left,
+                'has_pressed_right': user_input.has_pressed_right,
+                'has_pressed_fire': user_input.has_pressed_fire
+            }
         }
         return payload
 
@@ -26,6 +29,6 @@ class Serializer():
     @staticmethod
     def connection_to_player_definition_dic(connection):
         return {
-            'id': connection.id,
+            'id': connection.user_id,
             'position': connection.player.get_position()
         }

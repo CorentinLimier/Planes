@@ -15,14 +15,16 @@ class Game():
         return player
 
     def remove_player(self, player):
-        self.player.remove(player)
+        if player in self.players:
+            self.players.remove(player)
         
     def add_bullet(self, bullet):
         self.bullets.append(bullet)
-        
+
     def remove_bullet(self, bullet):
-        self.bullets.remove(bullet)
-            
+        if bullet in self.bullets:
+            self.bullets.remove(bullet)
+
     def init(self):
         pass
 

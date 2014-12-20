@@ -18,27 +18,30 @@ class Connection():
 
 class ConnectionHandler(LineReceiver):
 
-    def __init__(self, users, user_id):
+    def __init__(self, game, users, user_id):
         self.users = users
         self.user_id = user_id
+        self.game = game
 
-        connexion = Connection()
-        connexion.protocol = self
-        self.users[self.user_id] = connexion
+        connection = Connection()
+        connection.protocol = self
+        connection.user_id = user_id
+        self.users[self.user_id] = connection
 
     def connectionMade(self):
         connection = self.users[self.user_id]
         connection.connected = True
-        connection.user_id = True
         connection.player = self.game.add_player()
+
         self.send_payload({
             'type': 'authentication',
             'user': Serializer.connection_to_player_definition_dic(connection)
         })
 
         user_list = []
-        for connection in self.users:
+        for connection in self.users.itervalues():
             user_list.append(Serializer.connection_to_player_definition_dic(connection))
+
         self.send_payload({
             'type': 'user_list',
             'users': user_list
@@ -67,7 +70,7 @@ class ConnectionHandler(LineReceiver):
         self.game.update_player(connection.player, user_input)
         self.send_broadcast_payload_except_self({
             'type': 'user_input',
-            'content': payload,
+            'content': payload['content'],
             'user': Serializer.connection_to_player_definition_dic(connection)
         })
 
@@ -102,4 +105,4 @@ class ServerFactory(Factory):
 
     def buildProtocol(self, address):
         self.current_id += 1
-        return ConnectionHandler(self.users, self.current_id)
+        return ConnectionHandler(self.game, self.users, self.current_id)
