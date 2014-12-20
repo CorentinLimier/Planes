@@ -7,7 +7,7 @@ class MotherFuckingBullet():
         self.height = height
         self.position = position
         self.angle = angle
-        self.speed = 8
+        self.speed = 30
         self.crashed = False
     
     def update(self):
@@ -17,8 +17,9 @@ class MotherFuckingBullet():
         angle = math.radians(self.angle)
         self.position[0] += self.speed * frameCount * math.cos(angle)
         self.position[1] -= self.speed * frameCount * math.sin(angle)
-        if  self.position > (self.width, self.height) or self.position > (self.width, self.height):
-            self.crash()
+        self.isCrashed()
+
         
-    def crash(self):
-        self.crashed = True
+    def isCrashed(self):
+        if  self.position[0] > self.width or self.position[1] > self.height or self.position[0] < 0 or self.position[1] < 0:
+            self.crashed = True

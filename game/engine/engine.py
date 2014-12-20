@@ -29,6 +29,33 @@ class Game():
     def update_player(self, player, user_input):
         player.update_state(user_input)
 
+    
+    def check_bullets(self):
+        for player in self.players:
+            
+            for bullet in player.plane.bullets:
+                
+                for opponent in self.players:
+                    if opponent is player : 
+                        continue
+                    
+                    if ((bullet.position[0] - opponent.plane.position[0] > 0) and 
+                        (bullet.position[0] - opponent.plane.position[0] < 60) and
+                        (bullet.position[1] - opponent.plane.position[0] > 0) and
+                        (bullet.position[0] - opponent.plane.position[0] < 45)):
+                            bullet.crashed = True
+                            opponent.plane.hearts -= 10
+                            
+    def check_players(self):
+        for player in self.players:
+            if player.plane.crashed:
+                plane = Plane(self.width, self.height)
+                player.plane = plane
+    
     def tick(self):
         for player in self.players:
+            self.check_players()
+            self.check_bullets()
             player.update()
+            
+    
