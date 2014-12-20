@@ -1,34 +1,23 @@
-from userInput.userInput import UserInput
+from logger.logger import Logger
 
 
-class Serializer():
+class ProtocolDataUnit():
 
-    def __init__(self):
-        pass
+    def __init__(self, pdu_or_object):
+        Logger.debug("PDU init (%s:%s)", (type(pdu_or_object), pdu_or_object), 'network_protocol')
+        if isinstance(pdu_or_object, dict):
+            Logger.trace("PDU init from dict", category='network_protocol')
+            self.pdu = pdu_or_object
+        else:
+            Logger.trace("PDU init from object", category='network_protocol')
+            self.from_object(pdu_or_object)
 
-    @staticmethod
-    def user_input_to_payload(user_input):
-        payload = {
-            'type': 'user_input',
-            'content': {
-                'has_pressed_left': user_input.has_pressed_left,
-                'has_pressed_right': user_input.has_pressed_right,
-                'has_pressed_fire': user_input.has_pressed_fire
-            }
-        }
-        return payload
+    def from_object(self, object):
+        raise NotImplementedError("PDU: from_object")
 
-    @staticmethod
-    def payload_to_user_input(payload):
-        user_input = UserInput()
-        user_input.has_pressed_left = payload['content']['has_pressed_left']
-        user_input.has_pressed_right = payload['content']['has_pressed_right']
-        user_input.has_pressed_fire = payload['content']['has_pressed_fire']
-        return user_input
+    def get_object(self):
+        raise NotImplementedError("PDU: get_object")
 
-    @staticmethod
-    def connection_to_player_definition_dic(connection):
-        return {
-            'id': connection.user_id,
-            'position': connection.player.get_position()
-        }
+    def get_pdu(self):
+        raise NotImplementedError("PDU: get_pdu")
+
