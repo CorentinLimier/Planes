@@ -1,13 +1,16 @@
-from twisted.internet.protocol import Factory
+from twisted.internet.protocol import Factory, connectionDone
 from twisted.protocols.basic import LineReceiver
 import json
 from logger.logger import Logger
+from game.engine.engine import Game
+from network.application import Serializer
 
 
 class Connection():
     protocol = None
-    id = None
+    user_id = None
     connected = False
+    player = None
 
     def __init__(self):
         pass
@@ -15,49 +18,57 @@ class Connection():
 
 class ConnectionHandler(LineReceiver):
 
-    def __init__(self, users, id):
+    def __init__(self, users, user_id):
         self.users = users
-        self.id = id
+        self.user_id = user_id
 
         connexion = Connection()
         connexion.protocol = self
-        self.users[self.id] = connexion
+        self.users[self.user_id] = connexion
 
     def connectionMade(self):
-        self.users[self.id].connected = True
-        self.users[self.id].id = True
+        connection = self.users[self.user_id]
+        connection.connected = True
+        connection.user_id = True
+        connection.player = self.game.add_player()
         self.send_payload({
-            'id': self.id,
-            'type': 'authentication'
-        })
-        self.send_payload({
-            'id': self.id,
-            'type': 'user_list',
-            'users': {
-                'ids': self.users.keys()
-            }
-        })
-        self.send_broadcast_payload_except_self({
-            'id': self.id,
-            'type': 'new_connection'
+            'type': 'authentication',
+            'user': Serializer.connection_to_player_definition_dic(connection)
         })
 
-    def connectionLost(self, reason):
-        self.users[self.id].connected = False
-        self.send_broadcast_payload({
-            'id': self.id,
-            'type': 'lost_connection',
+        user_list = []
+        for connection in self.users:
+            user_list.append(Serializer.connection_to_player_definition_dic(connection))
+        self.send_payload({
+            'type': 'user_list',
+            'users': user_list
         })
-        if self.id in self.users:
-            del self.users[self.id]
+
+        self.send_broadcast_payload_except_self({
+            'type': 'new_connection',
+            'user': Serializer.connection_to_player_definition_dic(connection)
+        })
+
+    def connectionLost(self, reason=connectionDone):
+        self.users[self.user_id].connected = False
+        self.send_broadcast_payload({
+            'type': 'lost_connection',
+            'id': self.user_id
+        })
+        if self.user_id in self.users:
+            del self.users[self.user_id]
+        return reason
 
     def lineReceived(self, json_payload):
         Logger.debug('line received: %s', json_payload, 'server')
         payload = json.loads(json_payload)
+        user_input = Serializer.payload_to_user_input(payload)
+        connection = self.users[self.user_id]
+        self.game.update_player(connection.player, user_input)
         self.send_broadcast_payload_except_self({
-            'id': self.id,
             'type': 'user_input',
-            'content': payload
+            'content': payload,
+            'user': Serializer.connection_to_player_definition_dic(connection)
         })
 
     def send_broadcast_payload_except_self(self, payload):
@@ -85,6 +96,7 @@ class ConnectionHandler(LineReceiver):
 class ServerFactory(Factory):
 
     def __init__(self):
+        self.game = Game(800, 400)
         self.users = {}
         self.current_id = 0
 

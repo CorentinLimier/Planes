@@ -2,15 +2,14 @@
 import pygame
 from game.engine.engine import Game
 from game.hmi.hmi import Hmi
-from game.bo.player import Player
 from network.client import ClientProcessTwisted as ClientProcess
 from userInputFeed.userInputFeedLocal import UserInputFeedLocal
-from userInput.userInput import UserInput
 from logger.logger import Logger
+from network.application import Serializer
 
 if __name__ == "__main__":
     pygame.init()
-    game = Game(800,400)
+    game = Game(800, 400)
     hmi = Hmi(game)
     clock = pygame.time.Clock()
 
@@ -29,18 +28,6 @@ if __name__ == "__main__":
     # init player map
     playerMap = {}
 
-    def user_input_to_payload(user_input):
-        payload = {}
-        payload['has_pressed_left'] = user_input.has_pressed_left
-        payload['has_pressed_right'] = user_input.has_pressed_right
-        return payload
-
-    def payload_to_user_input(payload):
-        user_input = UserInput()
-        user_input.has_pressed_left = payload['content']['has_pressed_left']
-        user_input.has_pressed_right = payload['content']['has_pressed_right']
-        return user_input
-
     quit = False
     while not quit:
         # fetch network inputs and update game state
@@ -50,7 +37,7 @@ if __name__ == "__main__":
 
             if payload and 'type' in payload and payload['type'] == 'user_input':
                 Logger.trace("fetch input_queue from main, from network process to screen: (%s)", payload, 'start_client')
-                user_input = payload_to_user_input(payload)
+                user_input = Serializer.payload_to_user_input(payload)
                 user_id = payload['id']
                 game.update_player(playerMap[user_id], user_input)
 
@@ -75,8 +62,7 @@ if __name__ == "__main__":
             if payload and 'type' in payload and payload['type'] == 'lost_connection':
                 Logger.info("User lost connection (%s)", payload, 'start_client')
                 user_id = payload['id']
-                networkPlayer = playerMap[user_id]
-                game.remove_player(networkPlayer)
+                game.remove_player(playerMap[user_id])
                 playerMap.pop(user_id, None)
 
 
@@ -85,13 +71,13 @@ if __name__ == "__main__":
         game.update_player(localPlayer, user_input)
 
         # redraw game
-        game.update()
+        game.tick()
         hmi.draw()
 
         if user_input.has_pressed_something():
             # send local user_inputs
             Logger.debug("user_input to payload, from screen to network process", category='start_client')
-            payload = user_input_to_payload(user_input)
+            payload = Serializer.user_input_to_payload(user_input)
             Logger.trace("user_input to payload, from screen to network process: (%s)", payload, 'start_client')
             networkProcess.input_queue.put(payload)
 
