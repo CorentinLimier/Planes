@@ -1,10 +1,13 @@
+from game.bo.plane import Plane
 from userInput.userInput import UserInput, UserInputAggregate
 from game.bo.motherFuckingBullet import MotherFuckingBullet
 
 
 class Player():
 
-    def __init__(self, plane):
+    def __init__(self, plane=None):
+        if plane is None:
+            plane = Plane()
         self.plane = plane
 
     def update_state(self, user_input):

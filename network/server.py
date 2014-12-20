@@ -1,82 +1,33 @@
+import time
 from twisted.internet.protocol import Factory, connectionDone
 from twisted.protocols.basic import LineReceiver
 import json
-from game.network.protocol import PlayerDataUnit, UserInputDataUnit
 from logger.logger import Logger
-from game.engine.engine import Game
 
 
-class Connection():
-    protocol = None
-    user_id = None
-    connected = False
-    player = None
+class AbstractServerUserConnectionHandler(LineReceiver):
 
     def __init__(self):
         pass
 
-
-class ConnectionHandler(LineReceiver):
-
-    def __init__(self, game, users, user_id):
-        self.users = users
-        self.user_id = user_id
-        self.game = game
-
-        connection = Connection()
-        connection.protocol = self
-        connection.user_id = user_id
-        self.users[self.user_id] = connection
-
     def connectionMade(self):
-        connection = self.users[self.user_id]
-        connection.connected = True
-        connection.player = self.game.add_player()
-
-        self.send_payload({
-            'type': 'authentication',
-            'user': PlayerDataUnit(connection.player).set_id(connection.user_id).get_pdu(),
-        })
-
-        user_list = []
-        for connection in self.users.itervalues():
-            user_list.append(PlayerDataUnit(connection.player).set_id(connection.user_id).get_pdu())
-
-        self.send_payload({
-            'type': 'user_list',
-            'users': user_list
-        })
-
-        self.send_broadcast_payload_except_self({
-            'type': 'new_connection',
-            'user': PlayerDataUnit(connection.player).set_id(connection.user_id).get_pdu()
-        })
+        return self.on_connection_made()
 
     def connectionLost(self, reason=connectionDone):
-        self.users[self.user_id].connected = False
-        self.send_broadcast_payload({
-            'type': 'lost_connection',
-            'id': self.user_id
-        })
-        if self.user_id in self.users:
-            del self.users[self.user_id]
+        self.on_connection_lost()
         return reason
 
     def lineReceived(self, json_payload):
-        Logger.debug('line received: %s', json_payload, 'server')
-        payload = json.loads(json_payload)
+        return self.on_line_received(json_payload)
 
-        if payload and 'type' in payload and payload['type'] == 'user_input':
-            user_input = UserInputDataUnit(payload['content']).get_object()
-            connection = self.users[self.user_id]
-            self.game.update_player(connection.player, user_input)
-            self.send_broadcast_payload_except_self({
-                'type': 'user_input',
-                'content': payload['content'],
-                'user': PlayerDataUnit(connection.player).set_id(connection.user_id).get_pdu()
-            })
-        else:
-            Logger.error('Unknown message type: (%s)', json_payload, 'server')
+    def on_line_received(self, json_payload):
+        raise NotImplementedError('on_line_received')
+
+    def on_connection_lost(self):
+        raise NotImplementedError('on_connection_lost')
+
+    def on_connection_made(self):
+        raise NotImplementedError('on_connection_made')
 
     def send_broadcast_payload_except_self(self, payload):
         payload = json.dumps(payload)
@@ -100,13 +51,13 @@ class ConnectionHandler(LineReceiver):
         LineReceiver.rawDataReceived(self, data)
 
 
-class ServerFactory(Factory):
+class AbstractServerUserConnectionHandlerFactory(Factory):
 
     def __init__(self):
-        self.game = Game(800, 400)
-        self.users = {}
-        self.current_id = 0
+        pass
 
     def buildProtocol(self, address):
-        self.current_id += 1
-        return ConnectionHandler(self.game, self.users, self.current_id)
+        return self.on_build_user_connection_handler()
+
+    def on_build_user_connection_handler(self):
+        raise NotImplementedError('on_build_user_connection_handler')

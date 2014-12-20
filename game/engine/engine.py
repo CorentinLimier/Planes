@@ -10,8 +10,11 @@ class Game():
         self.players = []
         self.bullets = []
 
-    def add_player(self):
-        plane = Plane(self.width, self.height)
+    def add_player(self, position=None):
+        if position is None:
+            position = [self.width * 0.45, self.height * 0.8]
+
+        plane = Plane(self.width, self.height, position)
         player = Player(plane)
         self.players.append(player)
         return player
@@ -32,3 +35,4 @@ class Game():
     def tick(self):
         for player in self.players:
             player.update()
+            print player.get_position(), player.plane.angle, player.plane.crashed, player.plane.speed

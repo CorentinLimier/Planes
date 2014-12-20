@@ -1,6 +1,6 @@
 
 from twisted.internet import reactor
-from network.server import ServerFactory
+from game.network.server import ServerUserConnectionHandlerFactory
 
-reactor.listenTCP(5000, ServerFactory())
+reactor.listenTCP(5000, ServerUserConnectionHandlerFactory())
 reactor.run()

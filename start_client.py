@@ -2,7 +2,9 @@
 import pygame
 from game.engine.engine import Game
 from game.hmi.hmi import Hmi
-from game.network.protocol import UserInputDataUnit
+from game.network.client import ClientNetworkGameHandler
+from game.network.server import ServerUserConnectionHandler
+from helper.tick import TickSimulator
 from network.client import ClientProcessTwisted as ClientProcess
 from userInputFeed.userInputFeedLocal import UserInputFeedLocal
 from logger.logger import Logger
@@ -19,14 +21,10 @@ if __name__ == "__main__":
 
     # init local game
     localInputFeed = UserInputFeedLocal()
-    game.init()
 
-    # init local player
-    localPlayerId = None
-    localPlayer = game.add_player()
-
-    # init player map
-    playerMap = {}
+    # init client logic
+    client_game_handler = ClientNetworkGameHandler(game)
+    tick_simulator = TickSimulator(ServerUserConnectionHandler.fps)
 
     quit_the_game = False
     while not quit_the_game:
@@ -34,64 +32,26 @@ if __name__ == "__main__":
         if not networkProcess.output_queue.empty():
             payload = networkProcess.output_queue.get()
             Logger.debug("fetch input_queue from main, from network process to screen", category='start_client')
-
-            if payload and 'type' in payload:
-                if payload['type'] == 'user_input':
-                    Logger.trace("fetch input_queue from main, from network process to screen: (%s)", payload, 'start_client')
-                    user_input = UserInputDataUnit(payload['content']).get_object()
-                    user_id = payload['user']['id']
-                    game.update_player(playerMap[user_id], user_input)
-
-                elif payload['type'] == 'authentication':
-                    Logger.info("Authentication (%s)", payload, 'start_client')
-                    localPlayerId = payload['user']['id']
-                    playerMap[localPlayerId] = localPlayer
-
-                elif payload['type'] == 'user_list':
-                    Logger.info("User list (%s)", payload, 'start_client')
-                    for user_pdu in payload['users']:
-                        if not user_pdu['id'] == localPlayerId:
-                            networkPlayer = game.add_player()
-                            playerMap[user_pdu['id']] = networkPlayer
-
-                elif payload['type'] == 'new_connection':
-                    Logger.info("User new connection (%s)", payload, 'start_client')
-                    user_id = payload['user']['id']
-                    networkPlayer = game.add_player()
-                    playerMap[user_id] = networkPlayer
-
-                elif payload['type'] == 'lost_connection':
-                    Logger.info("User lost connection (%s)", payload, 'start_client')
-                    user_id = payload['id']
-                    game.remove_player(playerMap[user_id])
-                    playerMap.pop(user_id, None)
-
-                else:
-                    Logger.error('Unknown payload type: (%s)', payload['type'], 'start_client')
-
-            else:
-                Logger.error('Payload not defined or "type" key not defined: %s', payload, 'start_client')
+            client_game_handler.on_line_received(payload)
 
         # fetch local input and update game state
         user_input = localInputFeed.fetch_user_input()
-        game.update_player(localPlayer, user_input)
+        client_game_handler.on_local_user_input(user_input)
 
         # redraw game
+        #tick_simulator.simulate(game, lambda self: self.tick())
         game.tick()
         hmi.draw()
 
         if user_input.has_pressed_something():
             # send local user_inputs
             Logger.debug("user_input to payload, from screen to network process", category='start_client')
-            payload = {
-                'type': 'user_input',
-                'content': UserInputDataUnit(user_input).get_pdu()
-            }
+            payload = client_game_handler.user_input_to_payload(user_input)
             Logger.trace("user_input to payload, from screen to network process: (%s)", payload, 'start_client')
             networkProcess.input_queue.put(payload)
 
         # ask for 60 frames per second
-        clock.tick(60)
+        clock.tick(ServerUserConnectionHandler.fps)
 
     networkProcess.stop()
     game.quit()
