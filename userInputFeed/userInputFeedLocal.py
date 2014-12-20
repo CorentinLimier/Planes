@@ -18,9 +18,11 @@ class UserInputFeedLocal():
                     self._user_input.has_pressed_left = True
                 elif event.key == pygame.K_RIGHT:
                     self._user_input.has_pressed_right = True
+                elif event.key == pygame.K_SPACE:
+                    self._user_input.has_pressed_fire = True
 
             if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_SPACE:
                     self._user_input = UserInput()
 
         now = time.time()

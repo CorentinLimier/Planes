@@ -1,6 +1,6 @@
-
 from userInput.userInput import UserInput, UserInputAggregate
 from game.bo.plane import Plane
+from game.bo.motherFuckingBullet import MotherFuckingBullet
 
 
 class Player():
@@ -17,6 +17,8 @@ class Player():
                     self.plane.turn_left()
                 elif user_input.has_pressed_right:
                     self.plane.turn_right()
+                elif user_input.has_pressed_fire:
+                    self.shoot()
                 if user_input.has_pressed_quit:
                     self.plane.crash()
 
@@ -25,6 +27,7 @@ class Player():
                     self.plane.turn_left(user_input.pressed_left_frame_count)
                 elif user_input.pressed_right_frame_count:
                     self.plane.turn_right(user_input.pressed_right_frame_count)
+                    
             else:
                 raise Exception('Not implemented user input type %s(%s)' % (type(user_input), user_input))
 
@@ -37,3 +40,6 @@ class Player():
 
     def tick(self):
         self.plane.move_forward()
+
+    def shoot(self):
+        self.game.add_bullet(MotherFuckingBullet(self.game, self))

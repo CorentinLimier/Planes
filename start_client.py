@@ -28,8 +28,8 @@ if __name__ == "__main__":
     # init player map
     playerMap = {}
 
-    quit = False
-    while not quit:
+    quit_the_game = False
+    while not quit_the_game:
         # fetch network inputs and update game state
         if not networkProcess.output_queue.empty():
             payload = networkProcess.output_queue.get()
@@ -64,7 +64,6 @@ if __name__ == "__main__":
                 user_id = payload['id']
                 game.remove_player(playerMap[user_id])
                 playerMap.pop(user_id, None)
-
 
         # fetch local input and update game state
         user_input = localInputFeed.fetch_user_input()
