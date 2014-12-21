@@ -28,12 +28,18 @@ class ClientNetworkGameHandler():
                 self.localPlayerId = payload['user']['id']
                 self.game.add_player(self.localPlayerId)
 
-            elif payload['type'] == 'game_state':
-                Logger.info("Game state (%s)", payload, 'client_protocol')
+            elif payload['type'] == 'game_state_initial':
+                Logger.info("Game state initial (%s)", payload, 'client_protocol')
                 for user_pdu in GameDataUnit(payload['content']).get_players_pdu():
                     if not user_pdu.get_id() == self.localPlayerId:
                         player = self.game.add_player(user_pdu.get_id())
                         player.set_position(user_pdu.get_position())
+
+            elif payload['type'] == 'game_state':
+                Logger.info("Game state (%s)", payload, 'client_protocol')
+                for user_pdu in GameDataUnit(payload['content']).get_players_pdu():
+                    player = self.game.get_player(user_pdu.get_id())
+                    player.set_position(user_pdu.get_position())
 
             elif payload['type'] == 'new_connection':
                 Logger.info("User new connection (%s)", payload, 'client_protocol')

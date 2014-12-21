@@ -24,7 +24,7 @@ class ServerUserConnectionHandler(AbstractServerUserConnectionHandler):
         self.game = game
         self.user_id = user_id
         self.connections = connections
-        self.tick_simulator = TickSimulator(Game.fps)
+        self.tick_simulator = TickSimulator(Game.fps/2)
 
         self.connections[self.user_id] = self
 
@@ -39,7 +39,7 @@ class ServerUserConnectionHandler(AbstractServerUserConnectionHandler):
         })
 
         self.send_payload({
-            'type': 'game_state',
+            'type': 'game_state_initial',
             'content': GameDataUnit(self.game).get_pdu()
         })
 
@@ -69,6 +69,11 @@ class ServerUserConnectionHandler(AbstractServerUserConnectionHandler):
                 'type': 'user_input',
                 'content': payload['content'],
                 'user': PlayerDataUnit(self.game.get_player(self.user_id)).get_pdu()
+            })
+
+            self.send_broadcast_payload({
+                'type': 'game_state',
+                'content': GameDataUnit(self.game).get_pdu()
             })
         else:
             Logger.error('Unknown message type: (%s)', json_payload, 'server_protocol')

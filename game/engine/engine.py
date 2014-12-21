@@ -59,8 +59,8 @@ class Game():
     def check_players(self):
         for user_id, player in self.players.iteritems():
             if player.plane.crashed:
-                plane = Plane(self.width, self.height)
-                player.plane = plane
+                self.remove_player(user_id)
+                self.add_player(user_id)
 
     def tick(self):
         for user_id, player in self.players.iteritems():
