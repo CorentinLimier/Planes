@@ -1,4 +1,3 @@
-import time
 from twisted.internet.protocol import Factory, connectionDone
 from twisted.protocols.basic import LineReceiver
 import json

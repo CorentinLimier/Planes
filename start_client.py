@@ -3,7 +3,7 @@ import pygame
 from game.engine.engine import Game
 from game.hmi.hmi import Hmi
 from game.network.client import ClientNetworkGameHandler
-from helper.tick import TickSimulator
+from helper.time_helpers import TickSimulator
 from network.client import ClientProcessTwisted as ClientProcess
 from userInputFeed.userInputFeedLocal import UserInputFeedLocal
 from logger.logger import Logger

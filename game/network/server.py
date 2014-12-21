@@ -1,7 +1,7 @@
 import json
 from game.engine.engine import Game
 from game.network.protocol import PlayerDataUnit, UserInputDataUnit, GameDataUnit
-from helper.tick import TickSimulator
+from helper.time_helpers import TickSimulator, IntervalExecutor
 from logger.logger import Logger
 from network.server import AbstractServerUserConnectionHandlerFactory, AbstractServerUserConnectionHandler
 
@@ -19,12 +19,12 @@ class ServerUserConnectionHandlerFactory(AbstractServerUserConnectionHandlerFact
 
 
 class ServerUserConnectionHandler(AbstractServerUserConnectionHandler):
-
     def __init__(self, game, connections, user_id):
         self.game = game
         self.user_id = user_id
         self.connections = connections
         self.tick_simulator = TickSimulator(Game.fps)
+        self.interval_executor = IntervalExecutor(1)  # send sync message every 1s
 
         self.connections[self.user_id] = self
 
@@ -71,10 +71,9 @@ class ServerUserConnectionHandler(AbstractServerUserConnectionHandler):
                 'user': PlayerDataUnit(self.game.get_player(self.user_id)).get_pdu()
             })
 
-            self.send_broadcast_payload({
-                'type': 'game_state',
-                'content': GameDataUnit(self.game).get_pdu()
-            })
+            self.interval_executor.execute_if_interval_elapsed(self, lambda self: self.send_broadcast_payload(
+                {'type': 'game_state', 'content': GameDataUnit(self.game).get_pdu()}))
+
         else:
             Logger.error('Unknown message type: (%s)', json_payload, 'server_protocol')
 
