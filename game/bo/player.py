@@ -5,10 +5,11 @@ from game.bo.motherFuckingBullet import MotherFuckingBullet
 
 class Player():
 
-    def __init__(self, plane=None):
+    def __init__(self, user_id, plane=None):
         if plane is None:
             plane = Plane()
         self.plane = plane
+        self.user_id = user_id
 
     def update_state(self, user_input):
                 

@@ -26,17 +26,10 @@ class UserInputDataUnit(ProtocolDataUnit):
 
 class PlayerDataUnit(ProtocolDataUnit):
 
-    def __init__(self, pdu_or_object, user_id=None):
-        self.pdu = {}
-        if isinstance(pdu_or_object, dict):
-            self.from_dictionary(pdu_or_object)
-        else:
-            self.from_object(pdu_or_object, user_id)
-
-    def from_object(self, player, user_id):
+    def from_object(self, player):
         self.pdu = {
             'position': player.get_position(),
-            'id': user_id
+            'id': player.user_id
         }
         return self
 
@@ -52,23 +45,16 @@ class PlayerDataUnit(ProtocolDataUnit):
 
 class GameDataUnit(ProtocolDataUnit):
 
-    def __init__(self, pdu_or_object, player_map=None):
-        self.pdu = {}
-        if isinstance(pdu_or_object, dict):
-            self.from_dictionary(pdu_or_object)
-        else:
-            self.from_object(pdu_or_object, player_map)
-
-    def from_object(self, game, player_map):
+    def from_object(self, game):
         self.pdu = {
             'width': game.width,
             'height': game.height,
             'fps': game.fps,
-            'default_position': game.default_position,
+            'default_position': game.get_default_position(),
             'players': []
         }
-        for user_id, player in enumerate(player_map):
-            self.pdu['players'].append(PlayerDataUnit(player, user_id).get_pdu())
+        for user_id, player in game.players.iteritems():
+            self.pdu['players'].append(PlayerDataUnit(player).get_pdu())
         return self
 
     def from_dictionary(self, dictionary):

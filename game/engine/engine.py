@@ -1,9 +1,9 @@
 from game.bo.player import Player
 from game.bo.plane import Plane
-
+import copy
 
 class Game():
-    fps = 2
+    fps = 30
     width = 800
     height = 400
     default_position = None
@@ -11,23 +11,23 @@ class Game():
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.players = []
-        self.bullets = []
-        self.tick_counter = 0
+        self.players = {}
         Game.default_position = [Game.width * 0.45, Game.height * 0.8]
 
-    def add_player(self, position=None):
-        if position is None:
-            position = Game.default_position
+    def get_default_position(self):
+        return copy.copy(Game.default_position)
 
-        plane = Plane(self.width, self.height, position)
-        player = Player(plane)
-        self.players.append(player)
+    def add_player(self, user_id):
+        plane = Plane(self.width, self.height, self.get_default_position())
+        player = Player(user_id, plane)
+        self.players[user_id] = player
         return player
 
-    def remove_player(self, player):
-        if player in self.players:
-            self.players.remove(player)
+    def remove_player(self, user_id):
+        del self.players[user_id]
+
+    def get_player(self, user_id):
+        return self.players[user_id]
 
     def init(self):
         pass
@@ -35,16 +35,15 @@ class Game():
     def quit(self):
         pass
 
-    def update_player(self, player, user_input):
-        player.update_state(user_input)
-
+    def apply_user_input_to_player(self, user_id, user_input):
+        self.players[user_id].update_state(user_input)
 
     def check_bullets(self):
-        for player in self.players:
+        for user_id, player in self.players.iteritems():
 
             for bullet in player.plane.bullets:
 
-                for opponent in self.players:
+                for opponent_user_id, opponent in self.players.iteritems():
                     if opponent is player:
                         continue
 
@@ -58,15 +57,13 @@ class Game():
                         opponent.plane.hearts -= 10
 
     def check_players(self):
-        for player in self.players:
+        for user_id, player in self.players.iteritems():
             if player.plane.crashed:
                 plane = Plane(self.width, self.height)
                 player.plane = plane
 
     def tick(self):
-        #print "tick %s" % self.tick_counter
-        self.tick_counter += 1
-        for player in self.players:
+        for user_id, player in self.players.iteritems():
             self.check_players()
             self.check_bullets()
             player.update()

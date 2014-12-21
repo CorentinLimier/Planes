@@ -49,7 +49,7 @@ class Hmi():
         
     def draw(self):
         self.emptyScreen()    
-        for player in self.game.players:
+        for user_id, player in self.game.players.iteritems():
             for bullet in player.plane.bullets:
                 self.draw_bullet(bullet)  
             self.draw_plane(player.plane)

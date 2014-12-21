@@ -32,15 +32,15 @@ class AbstractServerUserConnectionHandler(LineReceiver):
     def send_broadcast_payload_except_self(self, payload):
         payload = json.dumps(payload)
         Logger.debug('broadcasting except self: %s', payload, 'server')
-        for name, connection in self.users.iteritems():
-            if connection.protocol != self:
-                connection.protocol.sendLine(payload)
+        for user_id, connection in self.connections.iteritems():
+            if connection is not self:
+                connection.sendLine(payload)
 
     def send_broadcast_payload(self, payload):
         payload = json.dumps(payload)
         Logger.debug('broadcasting to all: %s', payload, 'server')
-        for name, connection in self.users.iteritems():
-            connection.protocol.sendLine(payload)
+        for user_id, connection in self.connections.iteritems():
+            connection.sendLine(payload)
 
     def send_payload(self, payload):
         payload = json.dumps(payload)
