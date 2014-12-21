@@ -24,7 +24,7 @@ class ServerUserConnectionHandler(AbstractServerUserConnectionHandler):
         self.game = game
         self.user_id = user_id
         self.connections = connections
-        self.tick_simulator = TickSimulator(Game.fps/2)
+        self.tick_simulator = TickSimulator(Game.fps)
 
         self.connections[self.user_id] = self
 

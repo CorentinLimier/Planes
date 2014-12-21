@@ -38,8 +38,8 @@ if __name__ == "__main__":
         client_game_handler.on_local_user_input(user_input)
 
         # redraw game
-        #tick_simulator.simulate(game, lambda self: self.tick())
-        game.tick()
+        tick_simulator.simulate(game, lambda self: self.tick())
+        #game.tick()
         hmi.draw()
 
         if user_input.has_pressed_something():
