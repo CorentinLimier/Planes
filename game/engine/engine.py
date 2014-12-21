@@ -60,7 +60,7 @@ class Game():
     def check_players(self):
         for player in self.players:
             if player.plane.crashed:
-                plane = Plane(self.width, self.height, )
+                plane = Plane(self.width, self.height)
                 player.plane = plane
 
     def tick(self):

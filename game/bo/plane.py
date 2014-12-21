@@ -42,9 +42,7 @@ class Plane():
         self.position[0] += self.speed * frame_count * math.cos(angle)
         self.position[0] %= self.width
         self.position[1] -= self.speed * frame_count * math.sin(angle)
-        self.is_crashed()
-        if self.position > (self.width, self.height) or self.position > (self.width, self.height):
-            self.crash()
+        self.update_crashed()
         
     def shoot(self):
         position_bullet_x = self.position[0] + 30
@@ -53,14 +51,8 @@ class Plane():
         bullet = MotherFuckingBullet(position_bullet, self.angle, self.width, self.height)
         self.bullets.append(bullet)
 
-    def crash(self):
-        self.crashed = True
-
-    def is_crashed(self):
-        if self.position[0] > self.width or self.position[1] > self.height or self.position[0] < 0 or self.position[1] < 0:
+    def update_crashed(self):
+        if  self.position[0] > self.width or self.position[1] > self.height or self.position[0] < 0 or self.position[1] < 0:
             self.crashed = True
-            return True
-        if self.hearts < 0:
-            self.crashed = True
-            return True
-        return False
+        if self.hearts < 0 :
+            self.crashed = True        
