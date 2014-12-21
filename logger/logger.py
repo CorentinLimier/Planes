@@ -9,8 +9,8 @@ class Logger():
         'error',
         'warn',
         'info',
-        'debug',
-        'trace'
+        # 'debug',
+        # 'trace'
     ]
 
     hidden_categories = [

@@ -1,4 +1,4 @@
-from game.network.protocol import UserInputDataUnit, PlayerDataUnit
+from game.network.protocol import UserInputDataUnit, PlayerDataUnit, GameDataUnit
 from logger.logger import Logger
 
 
@@ -29,12 +29,12 @@ class ClientNetworkGameHandler():
                 self.localPlayerId = payload['user']['id']
                 self.playerMap[self.localPlayerId] = self.localPlayer
 
-            elif payload['type'] == 'user_list':
-                Logger.info("User list (%s)", payload, 'client_protocol')
-                for user_pdu in payload['users']:
-                    if not user_pdu['id'] == self.localPlayerId:
-                        network_player = self.game.add_player(PlayerDataUnit(user_pdu).get_object().get_position())
-                        self.playerMap[user_pdu['id']] = network_player
+            elif payload['type'] == 'game_state':
+                Logger.info("Game state (%s)", payload, 'client_protocol')
+                for user_pdu in GameDataUnit(payload['content']).get_players_pdu():
+                    if not user_pdu.get_id() == self.localPlayerId:
+                        network_player = self.game.add_player(user_pdu.get_position())
+                        self.playerMap[user_pdu.get_id()] = network_player
 
             elif payload['type'] == 'new_connection':
                 Logger.info("User new connection (%s)", payload, 'client_protocol')

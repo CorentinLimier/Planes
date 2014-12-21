@@ -1,6 +1,6 @@
 import json
 from game.engine.engine import Game
-from game.network.protocol import PlayerDataUnit, UserInputDataUnit
+from game.network.protocol import PlayerDataUnit, UserInputDataUnit, GameDataUnit
 from helper.tick import TickSimulator
 from logger.logger import Logger
 from network.server import AbstractServerUserConnectionHandlerFactory, AbstractServerUserConnectionHandler
@@ -51,21 +51,21 @@ class ServerUserConnectionHandler(AbstractServerUserConnectionHandler):
 
         self.send_payload({
             'type': 'authentication',
-            'user': PlayerDataUnit(connection.player).set_id(connection.user_id).get_pdu(),
+            'user': PlayerDataUnit(connection.player, connection.user_id).get_pdu(),
         })
 
         user_list = []
         for connection in self.users.itervalues():
-            user_list.append(PlayerDataUnit(connection.player).set_id(connection.user_id).get_pdu())
+            user_list.append(PlayerDataUnit(connection.player, connection.user_id).get_pdu())
 
         self.send_payload({
-            'type': 'user_list',
-            'users': user_list
+            'type': 'game_state',
+            'content': GameDataUnit(self.game, self.users).get_pdu()
         })
 
         self.send_broadcast_payload_except_self({
             'type': 'new_connection',
-            'user': PlayerDataUnit(connection.player).set_id(connection.user_id).get_pdu()
+            'user': PlayerDataUnit(connection.player, connection.user_id).get_pdu()
         })
 
     def on_connection_lost(self):
@@ -90,7 +90,7 @@ class ServerUserConnectionHandler(AbstractServerUserConnectionHandler):
             self.send_broadcast_payload_except_self({
                 'type': 'user_input',
                 'content': payload['content'],
-                'user': PlayerDataUnit(connection.player).set_id(connection.user_id).get_pdu()
+                'user': PlayerDataUnit(connection.player, connection.user_id).get_pdu()
             })
         else:
             Logger.error('Unknown message type: (%s)', json_payload, 'server_protocol')
